@@ -8,7 +8,8 @@ A multi-layer neural network built using only **NumPy**. This project explores t
 - **Output:** 10 classes (Softmax)
 
 ###  Learning Progress
-![Cost Curve](./cost_curve.png)
+![Cost Curve](<img width="1704" height="850" alt="image" src="https://github.com/user-attachments/assets/1b46de39-570b-4dbb-af22-a0c0385cf3ab" />
+)
 *The cost function shows a steady decrease, indicating the weights were successfully updated via backprop.*
 
 ### How to run
