@@ -23,4 +23,4 @@ This project was built while following the excellent tutorials from:
 - **Website/Course**: https://towardsdatascience.com/building-a-neural-network-from-scratch-8f03c5c50adc/
 - **Video**: https://youtu.be/aircAruvnKk?si=h3dUDIetU43VIr-u
 
-A huge thanks to them for the clear explanation of the mathematics behind backpropagation!
+A huge thanks to them for the clear explanation of the mathematics behind Neural Networks
