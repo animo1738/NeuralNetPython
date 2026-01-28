@@ -1,4 +1,4 @@
-# Jarvis: MNIST Digit Recognizer from Scratch
+# Jarvis: MNIST Digit Recogniser from Scratch
 
 A multi-layer neural network built using only **NumPy**. This project explores the mathematics of Backpropagation and Gradient Descent.
 
