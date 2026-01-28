@@ -2,7 +2,9 @@ import tkinter as tk
 from sklearn.datasets import fetch_openml
 import numpy as np
 from PIL import Image, ImageTk
-
+from matplotlib.figure import Figure 
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from machinelearning import self 
 #importing the mnist database as image to display.
 mnist = fetch_openml(name="mnist_784")
 data = mnist.data.to_numpy()
@@ -10,6 +12,21 @@ data = mnist.data.to_numpy()
 current_index = 0
 running = False
 
+def plot_cost(self):
+    fig = Figure(figsize=(5, 4), dpi=100)
+    ax = fig.add_subplot(111)
+
+    ax.plot(self.costs)
+    ax.set_xlabel("Epochs")
+    ax.set_ylabel("Cost")
+    ax.set_title("Learning Progress")
+
+    canvas = FigureCanvasTkAgg(fig, master=self.root)  # or any Tkinter frame
+    canvas.draw()
+    canvas.get_tk_widget().pack(fill="both", expand=True)
+
+    
+plot_cost(self)
 
 # def load_image(index):
 #     img_array = data[index].reshape(28,28).astype(np.uint8)
@@ -51,8 +68,11 @@ btn_start = tk.Button(root, image=root.loadimage)
 btn_start.grid(row=0, column=0, padx=10, pady=10, sticky="nw")
 btn_start["border"] = "0"
 
-canvas_node = tk.Canvas(root, bg="white", width=500, height=300)
+canvas_node = tk.Canvas(root, text="Node Layers", bg="#222", width=500, height=300, font=("Segoe UI", 10))
 canvas_node.grid(row=1, column = 0, columnspan=4, padx=10, pady=10, sticky="nsew")
+
+
+
 
 frame_numbers = tk.LabelFrame(root, text="Numbers", bg="#222", fg="white", font=("Segoe UI", 10))
 frame_numbers.grid(row=2, column=0, padx=10, pady=5, sticky="nsew")
