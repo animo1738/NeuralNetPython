@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from sklearn.datasets import fetch_openml
 from typing import List
+from matplotlib.figure import Figure 
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # progress bars in terminal
 
 # --- 1. ACTIVATION FUNCTIONS ---

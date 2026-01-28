@@ -1,103 +1,84 @@
 import tkinter as tk
-from sklearn.datasets import fetch_openml
-import numpy as np
+from tkinter import ttk
 from PIL import Image, ImageTk
-from matplotlib.figure import Figure 
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from machinelearning import self 
-#importing the mnist database as image to display.
-mnist = fetch_openml(name="mnist_784")
-data = mnist.data.to_numpy()
 
-current_index = 0
-running = False
+def apply_dark_theme(root):
+    style = ttk.Style(root)
+    style.theme_use("clam")
 
-def plot_cost(self):
-    fig = Figure(figsize=(5, 4), dpi=100)
-    ax = fig.add_subplot(111)
+    bg = "#1e1e1e"
+    fg = "#ffffff"
+    accent = "#3a3a3a"
 
-    ax.plot(self.costs)
-    ax.set_xlabel("Epochs")
-    ax.set_ylabel("Cost")
-    ax.set_title("Learning Progress")
+    root.configure(bg=bg)
 
-    canvas = FigureCanvasTkAgg(fig, master=self.root)  # or any Tkinter frame
-    canvas.draw()
-    canvas.get_tk_widget().pack(fill="both", expand=True)
+    style.configure("TFrame", background=bg)
+    style.configure("TLabelFrame", background=bg, foreground=fg, bordercolor=accent)
+    style.configure("TLabel", background=bg, foreground=fg)
+    style.configure("TButton",
+                    background=accent,
+                    foreground=fg,
+                    padding=8,
+                    relief="flat",
+                    font=("Segoe UI", 11))
+    style.map("TButton",
+              background=[("active", "#505050")])
 
-    
-plot_cost(self)
-
-# def load_image(index):
-#     img_array = data[index].reshape(28,28).astype(np.uint8)
-#     pil_img = Image.fromarray(img_array, mode="L").resize((200, 200))
-#     return ImageTk.PhotoImage(pil_img)
-
-# def update_image():
-#     global current_index,tk_img
-#     tk_img = load_image(current_index)
-#     panel.config(image=tk_img)
-
-
-# def auto_rotate():
-#     global current_index, running 
-#     if not running: 
-#         return    
-#     current_index = (current_index + 1) % len(data)
-#     update_image()
-#     root.after(200,auto_rotate)
-# def start_rotation():
-#     global running
-#     running = True
-#     auto_rotate() 
-# def stop_rotation(): 
-#     global running 
-#     running = False
-
-# configure window
 
 root = tk.Tk()
-# tk_img = load_image(current_index)
+root.title("Neural Network Visualizer")
+root.geometry("1200x700")
 
-root.grid_rowconfigure(2, weight=1) 
-root.grid_columnconfigure(3, weight=1)
+apply_dark_theme(root)
 
-root.loadimage = tk.PhotoImage(file="button_start-simulation.png")
+# ---------------- HEADER ----------------
+header = ttk.Frame(root, padding=15)
+header.grid(row=0, column=0, columnspan=3, sticky="ew")
 
-btn_start = tk.Button(root, image=root.loadimage)
-btn_start.grid(row=0, column=0, padx=10, pady=10, sticky="nw")
-btn_start["border"] = "0"
+title_label = ttk.Label(header, text="Neural Network Visualizer", font=("Segoe UI Semibold", 20))
+title_label.pack(anchor="center")
 
-canvas_node = tk.Canvas(root, text="Node Layers", bg="#222", width=500, height=300, font=("Segoe UI", 10))
-canvas_node.grid(row=1, column = 0, columnspan=4, padx=10, pady=10, sticky="nsew")
+# ---------------- BUTTON ----------------
+button_frame = ttk.Frame(root)
+button_frame.grid(row=1, column=2, sticky="w", padx=15, pady=10)
+
+btn_start = ttk.Button(button_frame, text="Start Simulation")
+btn_start.pack(anchor="w")
+
+# ---------------- CANVAS ----------------
+canvas_node = tk.Canvas(root, bg="#252526", highlightthickness=0)
+canvas_node.grid(row=2, column=0, columnspan=3, padx=15, pady=10, sticky="nsew")
+
+canvas_node.create_text(250, 20, text="Node Layers", fill="white", font=("Segoe UI", 12))
+
+# ---------------- BOTTOM FRAMES ----------------
+frame_numbers = ttk.LabelFrame(root, text="Numbers", padding=10)
+frame_numbers.grid(row=3, column=0, padx=15, pady=10, sticky="nsew")
+
+frame_accuracy = ttk.LabelFrame(root, text="Accuracy vs Iterations", padding=10)
+frame_accuracy.grid(row=3, column=1, padx=15, pady=10, sticky="nsew")
+
+frame_cost = ttk.LabelFrame(root, text="Cost vs Iterations", padding=10)
+frame_cost.grid(row=3, column=2, padx=15, pady=10, sticky="nsew")
+
+# Make bottom row taller
+root.grid_rowconfigure(2, weight=1)
+root.grid_rowconfigure(3, weight=3)
+
+# Make bottom frames expand
+for f in (frame_numbers, frame_accuracy, frame_cost):
+    f.grid_propagate(False)
+    f.configure(height=250)
 
 
+# ---------------- GRID WEIGHTS ----------------
+# Canvas expands vertically
+root.grid_rowconfigure(2, weight=3)
+root.grid_rowconfigure(3, weight=2)
 
-
-frame_numbers = tk.LabelFrame(root, text="Numbers", bg="#222", fg="white", font=("Segoe UI", 10))
-frame_numbers.grid(row=2, column=0, padx=10, pady=5, sticky="nsew")
-
-frame_accuracy = tk.LabelFrame(root, text="Accuracy vs Iterations", bg="#222", fg="white", font=("Segoe UI", 10))
-frame_accuracy.grid(row=2, column=1, padx=10, pady=5, sticky="nsew")
-
-frame_cost = tk.LabelFrame(root, text="Cost vs Iterations", bg="#222", fg="white", font=("Segoe UI", 10))
-frame_cost.grid(row=2, column=3, padx=10, pady=5, sticky="nsew")
-
-root.grid_rowconfigure(2, weight=1) 
-root.grid_columnconfigure(0, weight=1) 
+# Bottom frame width ratio 1 : 2 : 2
+root.grid_columnconfigure(0, weight=1)
 root.grid_columnconfigure(1, weight=2)
-
-
-# panel = tk.Label(root, image = tk_img)
-# panel.pack()
-
-# btn_start = tk.Button(root, text="Start Simulation", command=start_rotation)
-# btn_start.pack()
-# btn_stop = tk.Button(root, text="Stop", command=stop_rotation)
-# btn_stop.pack()
-
-
-
-
+root.grid_columnconfigure(2, weight=2)
 
 root.mainloop()
