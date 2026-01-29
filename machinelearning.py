@@ -1,3 +1,9 @@
+"""
+Jarvis Neural Network Classifier
+Author: animo1738
+Reference: Based on the tutorial by Bernardino Sassoli at https://towardsdatascience.com/building-a-neural-network-from-scratch-8f03c5c50adc/
+Date: 18/01/2026
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
@@ -219,24 +225,25 @@ reshaped_test_img = test_img.reshape(side_length, side_length)
 
 
 
+def execute_llm():
+    # --- 4. DATA PREPARATION & EXECUTION ---
+    print("Fetching MNIST...")
+    mnist = fetch_openml('mnist_784', version=1, as_frame=False)
+    X, y = mnist.data.T, mnist.target.astype(int)
 
+    # Split
+    X_train, X_test = X[:, :60000], X[:, 60000:]
+    y_train_raw, y_test_raw = y[:60000], y[60000:]
 
-# --- 4. DATA PREPARATION & EXECUTION ---
-print("Fetching MNIST...")
-mnist = fetch_openml('mnist_784', version=1, as_frame=False)
-X, y = mnist.data.T, mnist.target.astype(int)
+    # Encode labels
+    y_train = one_hot_encode(y_train_raw, 10).T
+    y_test = one_hot_encode(y_test_raw, 10).T
 
-# Split
-X_train, X_test = X[:, :60000], X[:, 60000:]
-y_train_raw, y_test_raw = y[:60000], y[60000:]
-
-# Encode labels
-y_train = one_hot_encode(y_train_raw, 10).T
-y_test = one_hot_encode(y_test_raw, 10).T
-
-# Initialize and Train
-# Architecture: [Hidden1, Hidden2] -> Output is added automatically
-PARAMS = [X_train, y_train, X_test, y_test, "relu", 10, [128, 32]]
-nn_relu = NN(*PARAMS)
-nn_relu.fit(lr=0.01, epochs=100)
-nn_relu.plot_cost()
+    # Initialize and Train
+    # Architecture: [Hidden1, Hidden2] -> Output is added automatically
+    PARAMS = [X_train, y_train, X_test, y_test, "relu", 10, [128, 32]]
+    nn_relu = NN(*PARAMS)
+    nn_relu.fit(lr=0.01, epochs=100)
+    nn_relu.plot_cost()
+if __name__ == "__main__":
+    execute_llm()
