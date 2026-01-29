@@ -6,18 +6,39 @@ import threading
 import numpy as np
 from sklearn.datasets import fetch_openml
 import time 
-
+# At the top of your script, under imports
+print("Loading MNIST data...")
+mnist = fetch_openml(name="mnist_784", version=1, as_frame=False)
+mnist_data = mnist.data 
+print("Data loaded.")
 is_simulation = False
 # global boolean flag to check status of simulation running 
-def start_simulation_thread():
+def run_simulation_wrapper():
     global is_simulation
     is_simulation = True
-    log_to_terminal("Initializing Neural Network...")
     try:
-        sim_thread = threading.Thread(target=execute_llm, args=(log_to_terminal,), daemon=True)
-        sim_thread.start()
+        execute_llm(log_to_terminal)
+    except Exception as e:
+        log_to_terminal(f"Error: {e}")
     finally:
         is_simulation = False
+        log_to_terminal("Simulation Finished.")
+
+def start_simulation_thread():
+    # We target the wrapper, not the raw execute_llm
+    sim_thread = threading.Thread(target=run_simulation_wrapper, daemon=True)
+    sim_thread.start()
+    
+def cycle_images():
+    if is_simulation:
+      
+        n = np.random.randint(0, len(mnist_data))
+        img_data = mnist_data[n]
+        import_mnist_image(img_data, image_display)
+        
+    # Check again in 1000ms (1 second), regardless of the flag
+    # This keeps the "loop" alive waiting for the simulation to start
+    root.after(1000, cycle_images)        
 
 def import_mnist_image(image_array, label_widget):
     reshaped = image_array.reshape(28, 28)
@@ -100,12 +121,10 @@ canvas_node.grid(row=3, column=0, columnspan=3, padx=15, pady=10, sticky="nsew")
 # ---------------- BOTTOM FRAMES ----------------
 frame_numbers = ttk.LabelFrame(root, text="Numbers", padding=10)
 frame_numbers.grid(row=2, column=0, padx=15, pady=10, sticky="nsew")
-while is_simulation == True:
-    image_display = ttk.Label(frame_numbers)
-    image_display.pack(pady=10)
-    img_data = random_mnist()
-    import_mnist_image(img_data, image_display)
+image_display = ttk.Label(frame_numbers)
+image_display.pack(pady=10)
 
+cycle_images()
 
 
 frame_accuracy = ttk.LabelFrame(root, text="Accuracy vs Iterations", padding=10)
