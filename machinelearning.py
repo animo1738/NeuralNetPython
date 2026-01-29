@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from sklearn.datasets import fetch_openml
 from typing import List
+from matplotlib.figure import Figure 
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
 # progress bars in terminal
 
 # --- 1. ACTIVATION FUNCTIONS ---
@@ -78,9 +81,11 @@ class NN:
             # when this is callled, features of the images are normalised (between 0 and 1)
             # adds a neuron layer with size 28x28 with the size of 10, the number of classes(0-9)
             # initialises an empty dictionary to store biases and weights
-    def initialize_parameters(self): 
+    def initialize_parameters(self,log_func = None): 
         for i in range(1, self.L):
-            print(f"Initialising parameters for layer: {i}")
+            if log_func:
+                log_func(f"Initialising parameters for layer: {i}")
+            
             self.parameters["w"+str(i)] = np.random.randn(self.architecture[i], self.architecture[i-1]) * 0.01
             self.parameters["b"+str(i)] = np.zeros((self.architecture[i], 1))
             # generates a number between 0 and 1 from a bell curve
@@ -146,7 +151,7 @@ class NN:
         return self.derivatives
 
     #runs the tests and sets parameters
-    def fit(self, lr = 0.01, epochs = 1000):
+    def fit(self, lr = 0.01, epochs = 1000,log_func = None):
         # where lr is the size of adjustments for the weights 
         # epochs are the number of iterations of the whole dataset
         self.costs = []
@@ -162,10 +167,16 @@ class NN:
             train_accuracy = self.accuracy(self.X, self.y)
             test_accuracy = self.accuracy(self.X_test, self.y_test)
             if epoch % 10 == 0:
-                print(f"Epoch: {epoch:3d} | Cost: {cost:.3f} | Accuracy: {train_accuracy:.3f}")
+                if log_func:
+                    log_func(f"Epoch: {epoch:3d} | Cost: {cost:.3f} | Accuracy: {train_accuracy:.3f}")
+
+                
             self.accuracies["train"].append(train_accuracy)
             self.accuracies["test"].append(test_accuracy)
-        print("Training terminated")
+        if log_func:
+            log_func("Training terminated")
+
+        
 
     def predict(self, x):
         params = self.parameters
@@ -225,9 +236,10 @@ reshaped_test_img = test_img.reshape(side_length, side_length)
 
 
 
-def execute_llm():
+def execute_llm(log_func):
     # --- 4. DATA PREPARATION & EXECUTION ---
-    print("Fetching MNIST...")
+    
+    log_func("Fetching MNIST...")
     mnist = fetch_openml('mnist_784', version=1, as_frame=False)
     X, y = mnist.data.T, mnist.target.astype(int)
 
@@ -243,7 +255,7 @@ def execute_llm():
     # Architecture: [Hidden1, Hidden2] -> Output is added automatically
     PARAMS = [X_train, y_train, X_test, y_test, "relu", 10, [128, 32]]
     nn_relu = NN(*PARAMS)
-    nn_relu.fit(lr=0.01, epochs=100)
+    nn_relu.fit(lr=0.01, epochs=100, log_func=log_func)
     nn_relu.plot_cost()
 if __name__ == "__main__":
     execute_llm()
