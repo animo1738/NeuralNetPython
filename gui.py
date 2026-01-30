@@ -157,31 +157,48 @@ title_label = ttk.Label(header, text="Neural Network Visualizer", font=("Segoe U
 title_label.pack(anchor="center")
 
 # ---------------- BUTTON AND SCROLLBARS----------------
-button_frame = ttk.Frame(root)
-button_frame.grid(row=1, column=0, sticky="w", padx=15, pady=10)
-btn_start = ttk.Button(button_frame, text="Start Simulation", command = start_simulation_thread)
-btn_start.pack(anchor="w")
-#simulation start button
 
-epoch_slider = tk.Scale(root, from_=100, to=1000, orient="horizontal", label="Amount of Epochs(simulation cycles)")
-epoch_slider.grid(row=2, column=0, sticky="w", padx=15, pady=10)
+sidebar = ttk.Frame(root, padding=10)
+sidebar.grid(row=1, column=0, rowspan=3, sticky="n", padx=15)
+
+# Start Button
+btn_start = ttk.Button(sidebar, text="Start Simulation", command=start_simulation_thread)
+btn_start.pack(fill="x", pady=(0, 20))
+
+# Epoch Slider
+epoch_slider = tk.Scale(sidebar, from_=100, to=1000, orient="horizontal", 
+    label="Amount of Epochs",
+    bg="#1e1e1e", 
+    fg="white", 
+    highlightthickness=0
+)
+epoch_slider.set(100)
+epoch_slider.pack(fill="x", pady=10)
+
+# Learning Rate Slider
+learningrate_slider = tk.Scale(sidebar, from_=0.01, to=1.0, resolution=0.01, 
+    orient="horizontal", 
+    label="Learning Rate",
+    bg="#1e1e1e", 
+    fg="white", 
+    highlightthickness=0
+)
+learningrate_slider.set(0.01)
+learningrate_slider.pack(fill="x", pady=10)
+
+
 AdjustedEpochs = epoch_slider.get()
-#epoch slider section
-
-
-learningrate_slider = tk.Scale(root, from_=0.1 , to=1, orient="horizontal", label="Amount of Epochs(simulation cycles)")
-learningrate_slider.grid(row=3, column=0, sticky="w", padx=15, pady=10)
-AdjustedLR = epoch_slider.get()
+AdjustedLR = learningrate_slider.get()
 
 # ---------------- CANVAS ----------------
 canvas_node = tk.Text(root, bg="#1e1e1e", fg="#00ff00", 
                           insertbackground="white", font=("Consolas", 10),
                           height=10)
-canvas_node.grid(row=3, column=1, columnspan=1, padx=15, pady=10, sticky="nsew")
+canvas_node.grid(row=3, column=1, columnspan=2, padx=15, pady=10, sticky="nsew")
 
 # ---------------- BOTTOM FRAMES ----------------
 frame_numbers = ttk.LabelFrame(root, text="Numbers", padding=10)
-frame_numbers.grid(row=3, column=2, padx=15, pady=10, sticky="nsew")
+frame_numbers.grid(row=3, column=0, padx=15, pady=10, sticky="nsew")
 image_border_frame = tk.Frame(frame_numbers, bg="#ff0000", padx=3, pady=3)
 image_border_frame.pack(pady=10)
 image_display = tk.Label(image_border_frame, bg="#1e1e1e")
