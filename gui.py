@@ -12,6 +12,10 @@ import matplotlib.pyplot as plt
 
 #---------GLOBAL VARIABLES--------------#
 trained_network = None
+fig_acc = Figure(figsize=(5, 4), dpi=100)
+fig_cost = Figure(figsize=(5, 4), dpi=100)
+canvas_cost = None
+canvas_acc = None
 
 # At the top of your script, under imports
 print("Loading MNIST data...")
@@ -31,7 +35,7 @@ def run_simulation_wrapper():
     finally:
         is_simulation = False
         log_to_terminal("Simulation Finished.")
-        root.after(0, plot_graphs)
+        
 
 def start_simulation_thread():
     # We target the wrapper, not the raw execute_llm
@@ -56,13 +60,44 @@ def import_mnist_image(image_array, label_widget):
     tk_img = ImageTk.PhotoImage(img)
     label_widget.config(image=tk_img)
     label_widget.image = tk_img
-def plot_graphs():
+def plot_costs():
     global trained_network
     plt.plot(trained_network.costs)
     plt.xlabel("Epochs")
     plt.ylabel("Cost")
     plt.title("Learning Progress")
-    plt.show()
+    return plt
+
+def plot_accuracy():
+    global trained_network
+    plt.plot(trained_network.accuracy)
+    plt.xlabel("Epochs")
+    plt.ylabel("Accuracy")
+    plt.title("Accuracy Progress")
+    return plt
+
+def plot_graphs():
+    global trained_network
+    if trained_network is None: return
+    fig_acc.clear() 
+    fig_cost.clear()
+    
+    ax = fig_acc.add_subplot(111)
+    ax.plot(trained_network.accuracies['train'], label="Train")
+    ax.plot(trained_network.accuracies['test'], label="Test")
+    ax.set_xlabel("Epochs")
+    ax.set_ylabel("Accuracy (%)")
+    ax.legend()
+
+    ax2 = fig_cost.add_subplot(111)
+    ax2.plot(trained_network.costs, color='red')
+    ax2.set_title("Loss (Cost) over Epochs")
+    
+
+    # draw the canvas
+    canvas_acc.draw()
+    canvas_cost.draw()
+
 def random_mnist():
     mnist = fetch_openml(name="mnist_784")
     data = mnist.data
@@ -151,22 +186,14 @@ image_border_frame = tk.Frame(frame_numbers, bg="#ff0000", padx=3, pady=3)
 image_border_frame.pack(pady=10)
 image_display = tk.Label(image_border_frame, bg="#1e1e1e")
 image_display.pack()
-
-
 cycle_images()
-
-
 frame_accuracy = ttk.LabelFrame(root, text="Accuracy vs Iterations", padding=10)
 frame_accuracy.grid(row=2, column=1, padx=15, pady=10, sticky="nsew")
-#import frame accuracy graph
-
-#Set up graph canvas
-
-
+accuracy_canvas = FigureCanvasTkAgg(fig_acc, master = frame_accuracy)  
 
 frame_cost = ttk.LabelFrame(root, text="Cost vs Iterations", padding=10)
 frame_cost.grid(row=2, column=2, padx=15, pady=10, sticky="nsew")
-
+accuracy_canvas = FigureCanvasTkAgg(fig_cost, master = frame_cost)  
 # Make bottom row taller
 root.grid_rowconfigure(2, weight=1)
 root.grid_rowconfigure(3, weight=3)
