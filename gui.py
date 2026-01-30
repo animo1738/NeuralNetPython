@@ -167,7 +167,7 @@ canvas_node.grid(row=3, column=0, columnspan=2, padx=15, pady=10, sticky="nsew")
 
 # ---------------- BOTTOM FRAMES ----------------
 frame_numbers = ttk.LabelFrame(root, text="Numbers", padding=10)
-frame_numbers.grid(row=3, column=3, padx=15, pady=10, sticky="nsew")
+frame_numbers.grid(row=3, column=2, padx=15, pady=10, sticky="nsew")
 image_border_frame = tk.Frame(frame_numbers, bg="#ff0000", padx=3, pady=3)
 image_border_frame.pack(pady=10)
 image_display = tk.Label(image_border_frame, bg="#1e1e1e")
@@ -188,14 +188,16 @@ root.grid_rowconfigure(3, weight=3)
 
 # Make bottom frames expand
 for f in (frame_numbers, frame_accuracy, frame_cost):
-    f.grid_propagate(False)
-    f.configure(height=250)
+    f.grid_propagate(True)
+    f.configure(height=300)
 
 
 # ---------------- GRID WEIGHTS ----------------
 # Canvas expands vertically
-root.grid_rowconfigure(2, weight=3)
-root.grid_rowconfigure(3, weight=2)
+root.grid_rowconfigure(0, weight=0)
+root.grid_rowconfigure(1, weight = 0)
+root.grid_rowconfigure(2, weight=1)
+root.grid_rowconfigure(3, weight=0)
 
 # Bottom frame width ratio 1 : 2 : 2
 root.grid_columnconfigure(0, weight=1)
