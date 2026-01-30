@@ -177,15 +177,14 @@ class NN:
                     "epoch": epoch,
                     "cost": cost,
                     "train_acc": train_accuracy,
+                    "test_acc" : test_accuracy,
+                    "nn_instance" : self 
                 }
                 update_ui_func(stats)
             if epoch % 10 == 0:
                 acc = self.accuracy(self.X, self.y)
-                if log_func:
-                    log_func(f"Epoch {epoch} accuracy = {acc:.2f}%")
             
             if border_func:
-                
                 border_func(acc)
                 
             self.accuracies["train"].append(train_accuracy)

@@ -16,6 +16,8 @@ fig_acc = Figure(figsize=(5, 4), dpi=100)
 fig_cost = Figure(figsize=(5, 4), dpi=100)
 canvas_cost = None
 canvas_acc = None
+AdjustedLR = None
+AdjustedEpochs = None
 
 # At the top of your script, under imports
 print("Loading MNIST data...")
@@ -35,7 +37,6 @@ def run_simulation_wrapper():
     finally:
         is_simulation = False
         log_to_terminal("Simulation Finished.")
-        root.after(0, plot_graphs)
         
 
 def start_simulation_thread():
@@ -44,9 +45,14 @@ def start_simulation_thread():
     sim_thread.start()
 
 def live_update(stats):
+    global trained_network
+    trained_network = stats.get('nn_instance')
+
     message = f"Epoch {stats['epoch']}: Loss {stats['cost']:.4f} | Acc {stats['train_acc']:.2f}%"
-    log_to_terminal(message)
-    update_border(stats['train_acc'])
+    root.after(0, lambda: log_to_terminal(message))
+    root.after(0, lambda: update_border(stats['train_acc']))
+    if stats['epoch'] % 5 == 0:
+        root.after(0, plot_graphs)
 
 def cycle_images():
     if is_simulation:
@@ -57,7 +63,7 @@ def cycle_images():
         
     # Check again in 1000ms (1 second), regardless of the flag
     # This keeps the "loop" alive waiting for the simulation to start
-    root.after(1000, cycle_images)        
+    root.after(3000, cycle_images)        
 
 def import_mnist_image(image_array, label_widget):
     reshaped = image_array.reshape(28, 28)
@@ -78,7 +84,6 @@ def plot_graphs():
     
     ax = fig_acc.add_subplot(111)
     ax.plot(trained_network.accuracies['train'], label="Train")
-    ax.plot(trained_network.accuracies['test'], label="Test")
     ax.set_xlabel("Epochs")
     ax.set_ylabel("Accuracy (%)")
     ax.legend()
@@ -104,18 +109,10 @@ def random_mnist():
     return data.iloc[n].values 
 
 def update_border(accuracy):
-    
-    color = "#3a3a3a" 
-    
-    if accuracy >= 15:
-        color = "#00ff00" 
-    elif accuracy >= 7:
-        color = "#008000" 
-    elif accuracy >= 2:
-        color = "#004d00" 
-    else:
-        color = "#ff0000" 
-
+    import random
+    colors = ['#00ff00','#ff0000' ]
+    probabilities = [accuracy,1-accuracy ]
+    color = random.choices(colors, weights=probabilities, k=1)[0]
     image_border_frame.config(bg=color)
 
 
@@ -159,13 +156,22 @@ header.grid(row=0, column=0, columnspan=3, sticky="ew")
 title_label = ttk.Label(header, text="Neural Network Visualizer", font=("Segoe UI Semibold", 20))
 title_label.pack(anchor="center")
 
-# ---------------- BUTTON ----------------
+# ---------------- BUTTON AND SCROLLBARS----------------
 button_frame = ttk.Frame(root)
 button_frame.grid(row=1, column=0, sticky="w", padx=15, pady=10)
-
-
 btn_start = ttk.Button(button_frame, text="Start Simulation", command = start_simulation_thread)
 btn_start.pack(anchor="w")
+#simulation start button
+
+epoch_slider = tk.Scale(root, from_=100, to=1000, orient="horizontal", label="Amount of Epochs(simulation cycles)")
+epoch_slider.grid(row=2, column=0, sticky="w", padx=15, pady=10)
+AdjustedEpochs = epoch_slider.get()
+#epoch slider section
+
+
+learningrate_slider = tk.Scale(root, from_=0.1 , to=1, orient="horizontal", label="Amount of Epochs(simulation cycles)")
+learningrate_slider.grid(row=3, column=0, sticky="w", padx=15, pady=10)
+AdjustedLR = epoch_slider.get()
 
 # ---------------- CANVAS ----------------
 canvas_node = tk.Text(root, bg="#1e1e1e", fg="#00ff00", 
