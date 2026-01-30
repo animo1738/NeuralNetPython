@@ -35,6 +35,7 @@ def run_simulation_wrapper():
     finally:
         is_simulation = False
         log_to_terminal("Simulation Finished.")
+        root.after(0, plot_graphs)
         
 
 def start_simulation_thread():
@@ -60,24 +61,9 @@ def import_mnist_image(image_array, label_widget):
     tk_img = ImageTk.PhotoImage(img)
     label_widget.config(image=tk_img)
     label_widget.image = tk_img
-def plot_costs():
-    global trained_network
-    plt.plot(trained_network.costs)
-    plt.xlabel("Epochs")
-    plt.ylabel("Cost")
-    plt.title("Learning Progress")
-    return plt
-
-def plot_accuracy():
-    global trained_network
-    plt.plot(trained_network.accuracy)
-    plt.xlabel("Epochs")
-    plt.ylabel("Accuracy")
-    plt.title("Accuracy Progress")
-    return plt
 
 def plot_graphs():
-    global trained_network
+    global trained_network, fig_acc, fig_cost, canvas_acc, canvas_cost
     if trained_network is None: return
     fig_acc.clear() 
     fig_cost.clear()
@@ -189,11 +175,13 @@ image_display.pack()
 cycle_images()
 frame_accuracy = ttk.LabelFrame(root, text="Accuracy vs Iterations", padding=10)
 frame_accuracy.grid(row=2, column=1, padx=15, pady=10, sticky="nsew")
-accuracy_canvas = FigureCanvasTkAgg(fig_acc, master = frame_accuracy)  
+canvas_acc = FigureCanvasTkAgg(fig_acc, master = frame_accuracy) 
+canvas_acc.get_tk_widget().pack(fill=tk.BOTH, expand=True) 
 
 frame_cost = ttk.LabelFrame(root, text="Cost vs Iterations", padding=10)
 frame_cost.grid(row=2, column=2, padx=15, pady=10, sticky="nsew")
-accuracy_canvas = FigureCanvasTkAgg(fig_cost, master = frame_cost)  
+canvas_cost = FigureCanvasTkAgg(fig_cost, master = frame_cost)  
+canvas_cost.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 # Make bottom row taller
 root.grid_rowconfigure(2, weight=1)
 root.grid_rowconfigure(3, weight=3)
