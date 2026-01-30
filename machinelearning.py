@@ -151,7 +151,7 @@ class NN:
         return self.derivatives
 
     #runs the tests and sets parameters
-    def fit(self, lr = 0.01, epochs = 1000,log_func = None):
+    def fit(self, lr = 0.01, epochs = 1000,log_func = None, border_func=None):
         # where lr is the size of adjustments for the weights 
         # epochs are the number of iterations of the whole dataset
         self.costs = []
@@ -167,14 +167,19 @@ class NN:
             train_accuracy = self.accuracy(self.X, self.y)
             test_accuracy = self.accuracy(self.X_test, self.y_test)
             if epoch % 10 == 0:
+                acc = self.accuracy(self.X, self.y)
                 if log_func:
-                    log_func(f"Epoch: {epoch:3d} | Cost: {cost:.3f} | Accuracy: {train_accuracy:.3f}")
-
+                    log_func(f"Epoch {epoch} accuracy = {acc:.2f}%")
+            
+            if border_func:
+                
+                border_func(acc)
                 
             self.accuracies["train"].append(train_accuracy)
             self.accuracies["test"].append(test_accuracy)
         if log_func:
             log_func("Training terminated")
+        return self
 
         
 
@@ -198,12 +203,12 @@ class NN:
         P = self.predict(X)
         return sum(np.equal(P, np.argmax(y, axis=0))) / y.shape[1]*100
     
-    def plot_cost(self):
-        plt.plot(self.costs)
-        plt.xlabel("Epochs")
-        plt.ylabel("Cost")
-        plt.title("Learning Progress")
-        plt.show()
+    # def plot_cost(self):
+    #     plt.plot(self.costs)
+    #     plt.xlabel("Epochs")
+    #     plt.ylabel("Cost")
+    #     plt.title("Learning Progress")
+    #     plt.show()
  
 
 
@@ -236,7 +241,7 @@ reshaped_test_img = test_img.reshape(side_length, side_length)
 
 
 
-def execute_llm(log_func):
+def execute_llm(log_func, update_border):
     # --- 4. DATA PREPARATION & EXECUTION ---
     
     log_func("Fetching MNIST...")
@@ -256,6 +261,10 @@ def execute_llm(log_func):
     PARAMS = [X_train, y_train, X_test, y_test, "relu", 10, [128, 32]]
     nn_relu = NN(*PARAMS)
     nn_relu.fit(lr=0.01, epochs=100, log_func=log_func)
-    nn_relu.plot_cost()
+    return nn_relu
+
+
+
+
 if __name__ == "__main__":
     execute_llm()

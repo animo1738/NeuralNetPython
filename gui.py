@@ -1,11 +1,18 @@
 import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
-from machinelearning import execute_llm 
+from machinelearning import execute_llm
 import threading
 import numpy as np
 from sklearn.datasets import fetch_openml
 import time 
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+
+#---------GLOBAL VARIABLES--------------#
+trained_network = None
+
 # At the top of your script, under imports
 print("Loading MNIST data...")
 mnist = fetch_openml(name="mnist_784", version=1, as_frame=False)
@@ -15,14 +22,16 @@ is_simulation = False
 # global boolean flag to check status of simulation running 
 def run_simulation_wrapper():
     global is_simulation
+    global trained_network
     is_simulation = True
     try:
-        execute_llm(log_to_terminal)
+        trained_network = execute_llm(log_to_terminal, update_border)
     except Exception as e:
         log_to_terminal(f"Error: {e}")
     finally:
         is_simulation = False
         log_to_terminal("Simulation Finished.")
+        root.after(0, plot_graphs)
 
 def start_simulation_thread():
     # We target the wrapper, not the raw execute_llm
@@ -47,7 +56,13 @@ def import_mnist_image(image_array, label_widget):
     tk_img = ImageTk.PhotoImage(img)
     label_widget.config(image=tk_img)
     label_widget.image = tk_img
-
+def plot_graphs():
+    global trained_network
+    plt.plot(trained_network.costs)
+    plt.xlabel("Epochs")
+    plt.ylabel("Cost")
+    plt.title("Learning Progress")
+    plt.show()
 def random_mnist():
     mnist = fetch_openml(name="mnist_784")
     data = mnist.data
@@ -57,9 +72,22 @@ def random_mnist():
 
     test_img = data.iloc[n].values
     test_label = mnist.target.iloc[n]
+    return data.iloc[n].values 
 
-    return data.iloc[n].values
+def update_border(accuracy):
+    
+    color = "#3a3a3a" 
+    
+    if accuracy >= 15:
+        color = "#00ff00" 
+    elif accuracy >= 7:
+        color = "#008000" 
+    elif accuracy >= 2:
+        color = "#004d00" 
+    else:
+        color = "#ff0000" 
 
+    image_border_frame.config(bg=color)
 
 
 def log_to_terminal(message):
@@ -116,19 +144,25 @@ canvas_node = tk.Text(root, bg="#1e1e1e", fg="#00ff00",
                           height=10)
 canvas_node.grid(row=3, column=0, columnspan=3, padx=15, pady=10, sticky="nsew")
 
-
-
 # ---------------- BOTTOM FRAMES ----------------
 frame_numbers = ttk.LabelFrame(root, text="Numbers", padding=10)
 frame_numbers.grid(row=2, column=0, padx=15, pady=10, sticky="nsew")
-image_display = ttk.Label(frame_numbers)
-image_display.pack(pady=10)
+image_border_frame = tk.Frame(frame_numbers, bg="#ff0000", padx=3, pady=3)
+image_border_frame.pack(pady=10)
+image_display = tk.Label(image_border_frame, bg="#1e1e1e")
+image_display.pack()
+
 
 cycle_images()
 
 
 frame_accuracy = ttk.LabelFrame(root, text="Accuracy vs Iterations", padding=10)
 frame_accuracy.grid(row=2, column=1, padx=15, pady=10, sticky="nsew")
+#import frame accuracy graph
+
+#Set up graph canvas
+
+
 
 frame_cost = ttk.LabelFrame(root, text="Cost vs Iterations", padding=10)
 frame_cost.grid(row=2, column=2, padx=15, pady=10, sticky="nsew")
