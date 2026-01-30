@@ -19,17 +19,18 @@ canvas_acc = None
 AdjustedLR = None
 AdjustedEpochs = None
 
-# At the top of your script, under imports
+
 print("Loading MNIST data...")
 mnist = fetch_openml(name="mnist_784", version=1, as_frame=False)
 mnist_data = mnist.data 
 print("Data loaded.")
+
 is_simulation = False
 # global boolean flag to check status of simulation running 
 def run_simulation_wrapper():
     global is_simulation
     global trained_network
-    is_simulation = True
+    
     try:
         trained_network = execute_llm(log_to_terminal, update_border,live_update)
     except Exception as e:
@@ -46,11 +47,13 @@ def start_simulation_thread():
 
 def live_update(stats):
     global trained_network
+    global is_simulation
     trained_network = stats.get('nn_instance')
-
+    is_simulation = True
     message = f"Epoch {stats['epoch']}: Loss {stats['cost']:.4f} | Acc {stats['train_acc']:.2f}%"
     root.after(0, lambda: log_to_terminal(message))
     root.after(0, lambda: update_border(stats['train_acc']))
+    root.after(0,lambda: cycle_images())
     if stats['epoch'] % 5 == 0:
         root.after(0, plot_graphs)
 
@@ -63,12 +66,12 @@ def cycle_images():
         
     # Check again in 1000ms (1 second), regardless of the flag
     # This keeps the "loop" alive waiting for the simulation to start
-    root.after(3000, cycle_images)        
+    root.after(1500, cycle_images)        
 
 def import_mnist_image(image_array, label_widget):
     reshaped = image_array.reshape(28, 28)
     img = Image.fromarray((reshaped * 255).astype('uint8'))
-    img = img.resize((200, 200), Image.Resampling.NEAREST)
+    img = img.resize((85, 85), Image.Resampling.NEAREST)
     tk_img = ImageTk.PhotoImage(img)
     label_widget.config(image=tk_img)
     label_widget.image = tk_img
@@ -111,7 +114,7 @@ def random_mnist():
 def update_border(accuracy):
     import random
     colors = ['#00ff00','#ff0000' ]
-    probabilities = [accuracy,1-accuracy ]
+    probabilities = [accuracy,100-accuracy ]
     color = random.choices(colors, weights=probabilities, k=1)[0]
     image_border_frame.config(bg=color)
 
@@ -170,7 +173,8 @@ epoch_slider = tk.Scale(sidebar, from_=100, to=1000, orient="horizontal",
     label="Amount of Epochs",
     bg="#1e1e1e", 
     fg="white", 
-    highlightthickness=0
+    highlightthickness=0,
+    
 )
 epoch_slider.set(100)
 epoch_slider.pack(fill="x", pady=10)
@@ -181,7 +185,8 @@ learningrate_slider = tk.Scale(sidebar, from_=0.01, to=1.0, resolution=0.01,
     label="Learning Rate",
     bg="#1e1e1e", 
     fg="white", 
-    highlightthickness=0
+    highlightthickness=0,
+   
 )
 learningrate_slider.set(0.01)
 learningrate_slider.pack(fill="x", pady=10)
@@ -203,7 +208,7 @@ image_border_frame = tk.Frame(frame_numbers, bg="#ff0000", padx=3, pady=3)
 image_border_frame.pack(pady=10)
 image_display = tk.Label(image_border_frame, bg="#1e1e1e")
 image_display.pack()
-cycle_images()
+
 frame_accuracy = ttk.LabelFrame(root, text="Accuracy vs Iterations", padding=10)
 frame_accuracy.grid(row=2, column=1, padx=15, pady=10, sticky="nsew")
 canvas_acc = FigureCanvasTkAgg(fig_acc, master = frame_accuracy) 
