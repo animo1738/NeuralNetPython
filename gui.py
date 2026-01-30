@@ -29,7 +29,7 @@ def run_simulation_wrapper():
     global trained_network
     is_simulation = True
     try:
-        trained_network = execute_llm(log_to_terminal, update_border)
+        trained_network = execute_llm(log_to_terminal, update_border,live_update)
     except Exception as e:
         log_to_terminal(f"Error: {e}")
     finally:
@@ -42,7 +42,12 @@ def start_simulation_thread():
     # We target the wrapper, not the raw execute_llm
     sim_thread = threading.Thread(target=run_simulation_wrapper, daemon=True)
     sim_thread.start()
-    
+
+def live_update(stats):
+    message = f"Epoch {stats['epoch']}: Loss {stats['cost']:.4f} | Acc {stats['train_acc']:.2f}%"
+    log_to_terminal(message)
+    update_border(stats['train_acc'])
+
 def cycle_images():
     if is_simulation:
       
@@ -67,6 +72,9 @@ def plot_graphs():
     if trained_network is None: return
     fig_acc.clear() 
     fig_cost.clear()
+    plt.style.use('dark_background') 
+    for f in [fig_acc, fig_cost]:
+        f.set_facecolor('#1e1e1e')
     
     ax = fig_acc.add_subplot(111)
     ax.plot(trained_network.accuracies['train'], label="Train")

@@ -149,14 +149,17 @@ class NN:
 
         self.derivatives = derivatives
         return self.derivatives
-
     #runs the tests and sets parameters
-    def fit(self, lr = 0.01, epochs = 1000,log_func = None, border_func=None):
+    def fit(self, lr = 0.01, epochs = 1000,log_func = None, border_func=None, update_ui_func = None):
         # where lr is the size of adjustments for the weights 
         # epochs are the number of iterations of the whole dataset
         self.costs = []
         self.initialize_parameters()
         self.accuracies = {"train": [], "test": []}
+        train_acc = self.accuracy(self.X, self.y)
+        test_acc = self.accuracy(self.X_test, self.y_test)
+        
+
         for epoch in tqdm(range(epochs), colour = "BLUE"):
             cost, cache = self.forward()
             self.costs.append(cost)
@@ -166,6 +169,16 @@ class NN:
                 self.parameters["b"+str(layer)] = self.parameters["b"+str(layer)] - lr * derivatives["db" + str(layer)]            
             train_accuracy = self.accuracy(self.X, self.y)
             test_accuracy = self.accuracy(self.X_test, self.y_test)
+            self.accuracies["train"].append(train_accuracy)
+            self.accuracies["test"].append(test_accuracy)
+
+            if update_ui_func:
+                stats = {
+                    "epoch": epoch,
+                    "cost": cost,
+                    "train_acc": train_accuracy,
+                }
+                update_ui_func(stats)
             if epoch % 10 == 0:
                 acc = self.accuracy(self.X, self.y)
                 if log_func:
@@ -241,7 +254,7 @@ reshaped_test_img = test_img.reshape(side_length, side_length)
 
 
 
-def execute_llm(log_func, update_border):
+def execute_llm(log_func, update_border,update_ui_func):
     # --- 4. DATA PREPARATION & EXECUTION ---
     
     log_func("Fetching MNIST...")
@@ -260,7 +273,7 @@ def execute_llm(log_func, update_border):
     # Architecture: [Hidden1, Hidden2] -> Output is added automatically
     PARAMS = [X_train, y_train, X_test, y_test, "relu", 10, [128, 32]]
     nn_relu = NN(*PARAMS)
-    nn_relu.fit(lr=0.01, epochs=100, log_func=log_func)
+    nn_relu.fit(lr=0.01, epochs=100, log_func=log_func, update_ui_func=update_ui_func)
     return nn_relu
 
 
