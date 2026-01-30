@@ -163,7 +163,7 @@ btn_start.pack(anchor="w")
 canvas_node = tk.Text(root, bg="#1e1e1e", fg="#00ff00", 
                           insertbackground="white", font=("Consolas", 10),
                           height=10)
-canvas_node.grid(row=3, column=0, columnspan=2, padx=15, pady=10, sticky="nsew")
+canvas_node.grid(row=3, column=1, columnspan=1, padx=15, pady=10, sticky="nsew")
 
 # ---------------- BOTTOM FRAMES ----------------
 frame_numbers = ttk.LabelFrame(root, text="Numbers", padding=10)
