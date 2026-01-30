@@ -30,9 +30,10 @@ is_simulation = False
 def run_simulation_wrapper():
     global is_simulation
     global trained_network
-    
+    selected_epochs = epoch_slider.get()
+    selected_lr = learningrate_slider.get()
     try:
-        trained_network = execute_llm(log_to_terminal, update_border,live_update)
+        trained_network = execute_llm(log_to_terminal, update_border,live_update, selected_epochs, selected_lr)
     except Exception as e:
         log_to_terminal(f"Error: {e}")
     finally:

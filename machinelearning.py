@@ -30,9 +30,9 @@ def leaky_relu(z: np.ndarray) -> np.ndarray:
 #extension of relu, allows negative values to leak in, default is 0.1 of negative input
 
 #output function:
-def softmax(z: np.ndarray) -> np.ndarray:
-    e = np.exp(z - np.max(z))
-    return e / np.sum(e, axis = 0)
+def softmax(z):
+    e = np.exp(z - np.max(z, axis=0, keepdims=True))
+    return e / np.sum(e, axis=0, keepdims=True)
 # takes numerical inputs and outputs a probability distribution for the digits it could be
 #derives function based on names
 def derivative(function_name: str, z: np.ndarray) -> np.ndarray:
@@ -253,7 +253,7 @@ reshaped_test_img = test_img.reshape(side_length, side_length)
 
 
 
-def execute_llm(log_func, update_border,update_ui_func):
+def execute_llm(log_func, update_border,update_ui_func,adjustedEpochs, adjustedLr):
     # --- 4. DATA PREPARATION & EXECUTION ---
     
     log_func("Fetching MNIST...")
@@ -272,7 +272,7 @@ def execute_llm(log_func, update_border,update_ui_func):
     # Architecture: [Hidden1, Hidden2] -> Output is added automatically
     PARAMS = [X_train, y_train, X_test, y_test, "relu", 10, [128, 32]]
     nn_relu = NN(*PARAMS)
-    nn_relu.fit(lr=0.01, epochs=100, log_func=log_func, update_ui_func=update_ui_func)
+    nn_relu.fit(lr=adjustedLr, epochs=adjustedEpochs, log_func=log_func, update_ui_func=update_ui_func)
     return nn_relu
 
 
