@@ -273,6 +273,7 @@ def execute_llm(log_func, update_border,update_ui_func,adjustedEpochs, adjustedL
     PARAMS = [X_train, y_train, X_test, y_test, "relu", 10, [128, 32]]
     nn_relu = NN(*PARAMS)
     nn_relu.fit(lr=adjustedLr, epochs=adjustedEpochs, log_func=log_func, update_ui_func=update_ui_func)
+    print(adjustedLr, adjustedEpochs)
     return nn_relu
 
 

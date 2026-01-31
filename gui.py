@@ -88,6 +88,7 @@ def plot_graphs():
     
     ax = fig_acc.add_subplot(111)
     ax.plot(trained_network.accuracies['train'], label="Train")
+    ax.plot(trained_network.accuracies['test'], label="Test")
     ax.set_xlabel("Epochs")
     ax.set_ylabel("Accuracy (%)")
     ax.legend()
@@ -181,7 +182,7 @@ epoch_slider.set(100)
 epoch_slider.pack(fill="x", pady=10)
 
 # Learning Rate Slider
-learningrate_slider = tk.Scale(sidebar, from_=0.01, to=1.0, resolution=0.01, 
+learningrate_slider = tk.Scale(sidebar, from_= 0.01, to=0.1, resolution=0.01, 
     orient="horizontal", 
     label="Learning Rate",
     bg="#1e1e1e", 
@@ -193,8 +194,7 @@ learningrate_slider.set(0.01)
 learningrate_slider.pack(fill="x", pady=10)
 
 
-AdjustedEpochs = epoch_slider.get()
-AdjustedLR = learningrate_slider.get()
+
 
 # ---------------- CANVAS ----------------
 canvas_node = tk.Text(root, bg="#1e1e1e", fg="#00ff00", 
