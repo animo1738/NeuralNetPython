@@ -72,10 +72,12 @@ def cycle_images():
 def import_mnist_image(image_array, label_widget):
     reshaped = image_array.reshape(28, 28)
     img = Image.fromarray((reshaped * 255).astype('uint8'))
-    img = img.resize((85, 85), Image.Resampling.NEAREST)
+    img = img.resize((95, 95), Image.Resampling.NEAREST)
     tk_img = ImageTk.PhotoImage(img)
     label_widget.config(image=tk_img)
     label_widget.image = tk_img
+
+
 
 def plot_graphs():
     global trained_network, fig_acc, fig_cost, canvas_acc, canvas_cost
@@ -182,7 +184,7 @@ epoch_slider.set(100)
 epoch_slider.pack(fill="x", pady=10)
 
 # Learning Rate Slider
-learningrate_slider = tk.Scale(sidebar, from_= 0.01, to=0.1, resolution=0.01, 
+learningrate_slider = tk.Scale(sidebar, from_= 0.01, to=0.05, resolution=0.01, 
     orient="horizontal", 
     label="Learning Rate",
     bg="#1e1e1e", 
