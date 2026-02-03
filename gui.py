@@ -39,11 +39,14 @@ def run_simulation_wrapper():
     finally:
         is_simulation = False
         log_to_terminal("Simulation Finished.")
+        root.after(0, lambda: btn_reset.config(state="normal"))
+
         
 
 def start_simulation_thread():
     # We target the wrapper, not the raw execute_llm
     sim_thread = threading.Thread(target=run_simulation_wrapper, daemon=True)
+    btn_reset.config(state="disabled")
     sim_thread.start()
 
 def live_update(stats):
@@ -115,6 +118,30 @@ def random_mnist():
     test_label = mnist.target.iloc[n]
     return data.iloc[n].values 
 
+def reset_simulation():
+    global trained_network, is_simulation
+
+    is_simulation = False
+    trained_network = None
+
+    canvas_node.delete("1.0", tk.END)
+
+    epoch_slider.set(100)
+    learningrate_slider.set(0.01)
+
+    image_display.config(image="")
+    image_display.image = None
+
+    image_border_frame.config(bg="#ff0000")
+
+    fig_acc.clear()
+    fig_cost.clear()
+    canvas_acc.draw()
+    canvas_cost.draw()
+
+    log_to_terminal("Simulation reset.")
+
+
 def update_border(accuracy):
     import random
     colors = ['#00ff00','#ff0000' ]
@@ -169,8 +196,12 @@ sidebar = ttk.Frame(root, padding=10)
 sidebar.grid(row=1, column=0, rowspan=3, sticky="n", padx=15)
 
 # Start Button
-btn_start = ttk.Button(sidebar, text="Start Simulation", command=start_simulation_thread)
-btn_start.pack(fill="x", pady=(0, 100))
+btn_start = ttk.Button(sidebar, text="Start Simulation", command=start_simulation_thread )
+btn_start.pack(fill="x", pady=(0, 50))
+
+btn_reset = ttk.Button(sidebar, text="Reset", command=reset_simulation)
+btn_reset.pack(fill="x", pady=(0, 20))
+
 
 # Epoch Slider
 epoch_slider = tk.Scale(sidebar, from_=100, to=1000, orient="horizontal", 
