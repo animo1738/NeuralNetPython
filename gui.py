@@ -40,6 +40,7 @@ def run_simulation_wrapper():
         is_simulation = False
         log_to_terminal("Simulation Finished.")
         root.after(0, lambda: btn_reset.config(state="normal"))
+        root.after(0, lambda: btn_start.config(state="normal"))
 
         
 
@@ -47,6 +48,7 @@ def start_simulation_thread():
     # We target the wrapper, not the raw execute_llm
     sim_thread = threading.Thread(target=run_simulation_wrapper, daemon=True)
     btn_reset.config(state="disabled")
+    
     sim_thread.start()
 
 def live_update(stats):
@@ -138,7 +140,7 @@ def reset_simulation():
     fig_cost.clear()
     canvas_acc.draw()
     canvas_cost.draw()
-
+    btn_start.config(state="disabled")
     log_to_terminal("Simulation reset.")
 
 
