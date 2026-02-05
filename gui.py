@@ -18,21 +18,23 @@ canvas_cost = None
 canvas_acc = None
 AdjustedLR = None
 AdjustedEpochs = None
+mnist_data = None
 
 
-print("Loading MNIST data...")
-mnist = fetch_openml(name="mnist_784", version=1, as_frame=False)
-mnist_data = mnist.data 
-print("Data loaded.")
 
 is_simulation = False
 # global boolean flag to check status of simulation running 
 def run_simulation_wrapper():
     global is_simulation
     global trained_network
+    global mnist_data
     selected_epochs = epoch_slider.get()
     selected_lr = learningrate_slider.get()
     try:
+        log_to_terminal("Loading MNIST data...")
+        mnist = fetch_openml(name="mnist_784", version=1, as_frame=False)
+        mnist_data = mnist.data 
+        log_to_terminal("Data loaded.")
         trained_network = execute_llm(log_to_terminal, update_border,live_update, selected_epochs, selected_lr)
     except Exception as e:
         log_to_terminal(f"Error: {e}")
@@ -46,7 +48,9 @@ def run_simulation_wrapper():
 
 def start_simulation_thread():
     # We target the wrapper, not the raw execute_llm
+    
     sim_thread = threading.Thread(target=run_simulation_wrapper, daemon=True)
+    btn_start.config(state="disabled")
     btn_reset.config(state="disabled")
     
     sim_thread.start()
@@ -64,6 +68,7 @@ def live_update(stats):
         root.after(0, plot_graphs)
 
 def cycle_images():
+    global mnist_data
     if is_simulation:
       
         n = np.random.randint(0, len(mnist_data))
@@ -140,7 +145,7 @@ def reset_simulation():
     fig_cost.clear()
     canvas_acc.draw()
     canvas_cost.draw()
-    btn_start.config(state="disabled")
+    
     log_to_terminal("Simulation reset.")
 
 
@@ -283,6 +288,6 @@ root.grid_columnconfigure(0, weight=1)
 root.grid_columnconfigure(1, weight=2)
 root.grid_columnconfigure(2, weight=2)
 root.grid_columnconfigure(0, minsize=200)
-root.grid_columnconfigure(1, minsize=600)
-root.grid_columnconfigure(2, minsize=600)
+root.grid_columnconfigure(1, minsize=440)
+root.grid_columnconfigure(2, minsize=440)
 root.mainloop()
