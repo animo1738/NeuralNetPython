@@ -6,7 +6,7 @@ import threading
 import numpy as np
 from sklearn.datasets import fetch_openml
 import time 
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 
@@ -247,13 +247,20 @@ image_display.pack()
 
 frame_accuracy = ttk.LabelFrame(root, text="Accuracy vs Iterations", padding=10)
 frame_accuracy.grid(row=2, column=1, padx=15, pady=10, sticky="nsew")
-canvas_acc = FigureCanvasTkAgg(fig_acc, master = frame_accuracy) 
+canvas_acc = FigureCanvasTkAgg(fig_acc, master = frame_accuracy)
+toolbar_acc = NavigationToolbar2Tk(canvas_acc, frame_accuracy) 
+toolbar_acc.update()
+toolbar_acc.pack() 
 canvas_acc.get_tk_widget().pack(fill=tk.BOTH, expand=True) 
 
 frame_cost = ttk.LabelFrame(root, text="Cost vs Iterations", padding=10)
 frame_cost.grid(row=2, column=2, padx=15, pady=10, sticky="nsew")
 canvas_cost = FigureCanvasTkAgg(fig_cost, master = frame_cost)  
+toolbar_cost = NavigationToolbar2Tk(canvas_cost, frame_cost) 
+toolbar_cost.update()
+toolbar_cost.pack()
 canvas_cost.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
 # Make bottom row taller
 root.grid_rowconfigure(2, weight=1)
 root.grid_rowconfigure(3, weight=3)
@@ -270,10 +277,12 @@ root.grid_rowconfigure(0, weight=0)
 root.grid_rowconfigure(1, weight = 0)
 root.grid_rowconfigure(2, weight=1)
 root.grid_rowconfigure(3, weight=0)
-
+root.grid_rowconfigure(3, minsize=200)
 # Bottom frame width ratio 1 : 2 : 2
 root.grid_columnconfigure(0, weight=1)
 root.grid_columnconfigure(1, weight=2)
 root.grid_columnconfigure(2, weight=2)
 root.grid_columnconfigure(0, minsize=200)
+root.grid_columnconfigure(1, minsize=600)
+root.grid_columnconfigure(2, minsize=600)
 root.mainloop()
